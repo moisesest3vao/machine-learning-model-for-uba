@@ -1,59 +1,85 @@
 import pandas as pd
 import numpy as np
+import random
+from faker import Faker
 
-# Definindo o número de amostras
-n_samples = 1000
+# Initialize Faker for generating realistic data
+fake = Faker()
 
-# Gerando dados fictícios
-np.random.seed(42)  # Para reprodutibilidade
+# Set random seed for reproducibility
+np.random.seed(42)
+random.seed(42)
 
-data = {
-    'login_location_diff': np.random.randint(0, 2, size=n_samples),
-    'login_ip_diff': np.random.randint(0, 2, size=n_samples),
-    'behavior_anomaly': np.random.randint(0, 2, size=n_samples),
-    'failed_logins': np.random.poisson(2, size=n_samples),
-    'successful_logins': np.random.poisson(20, size=n_samples),
-    'account_age_days': np.random.randint(0, 3650, size=n_samples),
-    'password_change_freq': np.random.randint(30, 365, size=n_samples),
-    'suspicious_activity': np.random.randint(0, 2, size=n_samples),
-    'login_time_diff': np.random.exponential(30, size=n_samples),
-    'access_device_change': np.random.randint(0, 2, size=n_samples),
-    'email_change': np.random.randint(0, 2, size=n_samples),
-    'ip_blacklisted': np.random.randint(0, 2, size=n_samples),
-    'password_strength': np.random.randint(1, 11, size=n_samples),
-    'account_locked': np.random.randint(0, 2, size=n_samples),
-    'multiple_failed_logins': np.random.poisson(1, size=n_samples),
-    'unusual_time_logins': np.random.randint(0, 2, size=n_samples),
-    'login_frequency': np.random.poisson(10, size=n_samples),
-    'suspicious_ips': np.random.poisson(1, size=n_samples),
-    'device_fingerprint_change': np.random.randint(0, 2, size=n_samples),
-    'high_risk_location': np.random.randint(0, 2, size=n_samples),
-    'account_role_change': np.random.randint(0, 2, size=n_samples),
-    'access_time_hours': np.random.poisson(5, size=n_samples),
-    'unusual_login_location': np.random.randint(0, 2, size=n_samples),
-    'file_access_frequency': np.random.poisson(3, size=n_samples),
-    'unauthorized_app_access': np.random.randint(0, 2, size=n_samples),
-    'data_exfiltration_attempts': np.random.poisson(1, size=n_samples),
-    'network_anomalies': np.random.randint(0, 2, size=n_samples),
-    'login_duration': np.random.exponential(20, size=n_samples),
-    'high_volume_downloads': np.random.poisson(2, size=n_samples),
-    'unusual_login_ip_range': np.random.randint(0, 2, size=n_samples),
-    'multi_factor_auth_enabled': np.random.randint(0, 2, size=n_samples),
-    'account_privilege_changes': np.random.randint(0, 2, size=n_samples),
-    'email_forwarding': np.random.randint(0, 2, size=n_samples),
-    'system_alerts_generated': np.random.poisson(2, size=n_samples),
-    'remote_access': np.random.randint(0, 2, size=n_samples),
-    'suspicious_file_modifications': np.random.poisson(1, size=n_samples),
-    'unusual_file_uploads': np.random.randint(0, 2, size=n_samples),
-    'compromised_device': np.random.randint(0, 2, size=n_samples),
-    'access_to_restricted_areas': np.random.randint(0, 2, size=n_samples),
-    'unusual_account_activity': np.random.randint(0, 2, size=n_samples),
-    'external_links_in_emails': np.random.poisson(1, size=n_samples),
-    'data_access_by_role': np.random.poisson(2, size=n_samples),
-    'compromised': np.random.randint(0, 2, size=n_samples)  # Variável alvo
-}
+# Define the number of records
+num_records = 100
 
-df = pd.DataFrame(data)
+# Generate features
+def generate_data(num_records):
+    data = []
+    for _ in range(num_records):
+        # Randomly decide if the account is compromised
+        compromised = random.choices([0, 1], weights=[0.8, 0.2])[0]  # 80% non-compromised, 20% compromised
+        
+        # Generate features based on the compromised status
+        if compromised:
+            failed_login_attempts = np.random.poisson(10)
+            last_login_time = fake.date_time_this_year()
+            login_location_changes = np.random.poisson(5)
+            num_transactions = np.random.poisson(20)
+            transaction_amounts = np.random.normal(500, 300, num_transactions).tolist()
+            device_fingerprint_changes = np.random.poisson(5)
+            ip_addresses = fake.ipv4()
+            account_age = np.random.randint(1, 5)  # 1 to 5 years
+            password_changes = np.random.poisson(5)
+            two_factor_auth = 0
+            suspicious_activity_alerts = np.random.poisson(5)
+            account_balance_changes = np.random.normal(1000, 500)
+        else:
+            failed_login_attempts = np.random.poisson(2)
+            last_login_time = fake.date_time_this_year()
+            login_location_changes = np.random.poisson(1)
+            num_transactions = np.random.poisson(5)
+            transaction_amounts = np.random.normal(200, 100, num_transactions).tolist()
+            device_fingerprint_changes = np.random.poisson(1)
+            ip_addresses = fake.ipv4()
+            account_age = np.random.randint(1, 10)  # 1 to 10 years
+            password_changes = np.random.poisson(1)
+            two_factor_auth = 1
+            suspicious_activity_alerts = np.random.poisson(1)
+            account_balance_changes = np.random.normal(2000, 300)
 
-# Salvando em CSV
-df.to_csv('user_behavior_expanded_data_v2.csv', index=False)
+        # Append the generated row to the data list
+        data.append([
+            failed_login_attempts,
+            last_login_time,
+            login_location_changes,
+            num_transactions,
+            np.mean(transaction_amounts) if transaction_amounts else 0,
+            device_fingerprint_changes,
+            ip_addresses,
+            account_age,
+            password_changes,
+            two_factor_auth,
+            suspicious_activity_alerts,
+            account_balance_changes,
+            compromised
+        ])
+    
+    return data
+
+# Create DataFrame
+columns = [
+    'Failed_Login_Attempts', 'Last_Login_Time', 'Login_Location_Changes',
+    'Number_of_Transactions', 'Average_Transaction_Amount',
+    'Device_Fingerprint_Changes', 'IP_Address', 'Account_Age',
+    'Password_Changes', '2FA_Status', 'Suspicious_Activity_Alerts',
+    'Account_Balance_Changes', 'Compromised'
+]
+
+data = generate_data(num_records)
+df = pd.DataFrame(data, columns=columns)
+
+# Save to CSV
+df.to_csv('banking_account_compromise_data.csv', index=False)
+
+print("CSV file 'banking_account_compromise_data.csv' has been created.")

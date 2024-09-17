@@ -17,24 +17,28 @@ async def on_startup():
     initialize()
 
 @app.post("/predict/")
-async def predict(request: dict[str, int]):
-    # Convert request data to DataFrame
+async def predict(request: dict):
     new_data = pd.DataFrame([request])
-
+    
     try:
-        # Perform prediction
-        prediction = model.clf.predict(new_data)
-        prediction_proba = model.clf.predict_proba(new_data)
+        # Preprocess the input data
+        categorical_columns = config.get_categorical_columns()
+        numerical_features = config.get_numerical_features()
 
+        new_data_preprocessed = model.preprocess_features(new_data, model.scaler, model.encoder, categorical_columns, numerical_features)
+        
+        # Perform prediction
+        prediction = model.clf.predict(new_data_preprocessed)
+        prediction_proba = model.clf.predict_proba(new_data_preprocessed)
+        
         # Return results
         return {
             "prediction": True if prediction[0] == 1 else False,
             "compromised_probability": f"{prediction_proba[0][1]:.2f}",
             "uncompromised_probability": f"{prediction_proba[0][0]:.2f}"
         }
-
+    
     except Exception as e:
-        # Raise HTTP Exception with error details
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/")

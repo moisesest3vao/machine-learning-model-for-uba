@@ -5,6 +5,8 @@ import json
 TRAINING_FILE_PATH_CONFIG_ATTR = 'training_file_path'
 X_CONFIG_ATTR = 'X'
 y_CONFIG_ATTR = 'y'
+NUMERICAL_FEATURES_CONFIG_ATTR = 'numerical_features'
+CATEGORICAL_COLUMNS_CONFIG_ATTR = 'categorical_columns'
 
 # Configuration file cache
 CONFIG = None
@@ -28,6 +30,16 @@ def get_X():
     if CONFIG is None:
         raise RuntimeError("Configuration has not been initialized.")
     return CONFIG.get(X_CONFIG_ATTR)
+
+def get_categorical_columns():
+    if CONFIG is None:
+        raise RuntimeError("Configuration has not been initialized.")
+    return CONFIG.get(CATEGORICAL_COLUMNS_CONFIG_ATTR)
+
+def get_numerical_features():
+    if CONFIG is None:
+        raise RuntimeError("Configuration has not been initialized.")
+    return CONFIG.get(NUMERICAL_FEATURES_CONFIG_ATTR)
 
 def get_y():
     if CONFIG is None:
